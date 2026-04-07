@@ -1,0 +1,89 @@
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  color: #282828;
+}
+
+/* ===== SKY-Omni brand colors ===== */
+:root {
+  --sky-omni-primary: #0070d2;
+  --sky-omni-secondary: #1b5297;
+  --sky-omni-accent: #00a651;
+  --sky-omni-bg: #f5f5f5;
+  --sky-omni-surface: #ffffff;
+  --sky-omni-border: #d8d8d8;
+  --sky-omni-text: #282828;
+  --sky-omni-text-muted: #686868;
+  --sky-omni-danger: #c62828;
+  --sky-omni-medic: #e53935;
+}
+
+/* ===== Streaming output ===== */
+.stream-output {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 6px;
+  padding: 1.25rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 200px;
+  max-height: 600px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.stream-output.medic-output {
+  background: #fff;
+  color: #282828;
+  border: 1px solid var(--sky-omni-border);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+
+/* ===== Blinking cursor during stream ===== */
+.streaming-cursor::after {
+  content: '▋';
+  animation: blink 0.7s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ===== Loading spinner ===== */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0,112,210,0.3);
+  border-top-color: #0070d2;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Utility ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

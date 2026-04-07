@@ -1,0 +1,86 @@
+<section class="medic-panel" aria-label="The Medic — Log to Logic">
+
+  <!-- Header -->
+  <div class="panel-header medic-header">
+    <div class="panel-icon" aria-hidden="true">🩺</div>
+    <div>
+      <h2 class="panel-title medic-title">The Medic</h2>
+      <p class="panel-subtitle">Paste an error log → get root cause analysis and an immediate code fix</p>
+    </div>
+  </div>
+
+  <!-- Demo logs -->
+  <div class="demo-prompts" role="region" aria-label="Demo error logs">
+    <span class="demo-label">Try a demo log:</span>
+    <button
+      *ngFor="let demo of demoLogs; let i = index"
+      class="demo-chip medic-chip"
+      (click)="useDemo(demo)"
+      [attr.aria-label]="'Load demo error log: ' + demoLabels[i]"
+      [title]="demoLabels[i]">
+      {{ demoLabels[i] }}
+    </button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-section">
+    <label for="medic-log" class="input-label">Paste your error log</label>
+    <textarea
+      id="medic-log"
+      class="input-textarea log-textarea"
+      [(ngModel)]="logInput"
+      placeholder="Paste stack trace, exception output, or API error response here..."
+      rows="8"
+      [disabled]="isStreaming"
+      (keydown.ctrl.enter)="diagnose()"
+      aria-describedby="medic-hint">
+    </textarea>
+    <p id="medic-hint" class="input-hint">Press Ctrl+Enter to diagnose</p>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row">
+    <button
+      class="btn btn-medic"
+      (click)="diagnose()"
+      [disabled]="!logInput.trim() || isStreaming"
+      aria-label="Diagnose error log">
+      <span *ngIf="isStreaming" class="spinner" aria-hidden="true"></span>
+      {{ isStreaming ? 'Diagnosing...' : '🔍 Diagnose' }}
+    </button>
+    <button
+      *ngIf="isStreaming"
+      class="btn btn-secondary"
+      (click)="stop()"
+      aria-label="Stop diagnosis">
+      ⏹ Stop
+    </button>
+    <button
+      *ngIf="output && !isStreaming"
+      class="btn btn-ghost"
+      (click)="clear()"
+      aria-label="Clear output">
+      🗑 Clear
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="hasError" class="error-banner" role="alert">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Output -->
+  <div *ngIf="output || isStreaming" class="output-section">
+    <div class="output-header">
+      <span class="output-label">Diagnosis Report</span>
+    </div>
+    <div
+      class="stream-output medic-output"
+      [class.streaming-cursor]="isStreaming"
+      aria-live="polite"
+      aria-label="Diagnosis and fix output"
+      [innerHTML]="formattedOutput">
+    </div>
+  </div>
+
+</section>

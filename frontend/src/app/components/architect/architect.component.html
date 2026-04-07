@@ -1,0 +1,90 @@
+<section class="architect-panel" aria-label="The Architect — Design to Code">
+
+  <!-- Header -->
+  <div class="panel-header architect-header">
+    <div class="panel-icon architect-icon" aria-hidden="true">🏗️</div>
+    <div>
+      <h2 class="panel-title">The Architect</h2>
+      <p class="panel-subtitle">Describe a UI requirement → get production-ready SKY UX Angular code</p>
+    </div>
+  </div>
+
+  <!-- Demo prompts -->
+  <div class="demo-prompts" role="region" aria-label="Demo prompts">
+    <span class="demo-label">Try a demo:</span>
+    <button
+      *ngFor="let demo of demoPrompts; let i = index"
+      class="demo-chip"
+      (click)="useDemo(demo)"
+      [attr.aria-label]="'Load demo prompt ' + (i + 1)">
+      Demo {{ i + 1 }}
+    </button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-section">
+    <label for="architect-prompt" class="input-label">Describe the component you need</label>
+    <textarea
+      id="architect-prompt"
+      class="input-textarea"
+      [(ngModel)]="prompt"
+      placeholder="e.g. Create a SKY UX data grid showing donors with name, amount, and date columns with search and pagination"
+      rows="4"
+      [disabled]="isStreaming"
+      (keydown.ctrl.enter)="generate()"
+      aria-describedby="architect-hint">
+    </textarea>
+    <p id="architect-hint" class="input-hint">Press Ctrl+Enter to generate</p>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row">
+    <button
+      class="btn btn-primary"
+      (click)="generate()"
+      [disabled]="!prompt.trim() || isStreaming"
+      aria-label="Generate SKY UX component code">
+      <span *ngIf="isStreaming" class="spinner" aria-hidden="true"></span>
+      {{ isStreaming ? 'Generating...' : '⚡ Generate Component' }}
+    </button>
+    <button
+      *ngIf="isStreaming"
+      class="btn btn-secondary"
+      (click)="stop()"
+      aria-label="Stop generation">
+      ⏹ Stop
+    </button>
+    <button
+      *ngIf="output && !isStreaming"
+      class="btn btn-ghost"
+      (click)="clear()"
+      aria-label="Clear output">
+      🗑 Clear
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="hasError" class="error-banner" role="alert">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Output -->
+  <div *ngIf="output || isStreaming" class="output-section">
+    <div class="output-header">
+      <span class="output-label">Generated Code</span>
+      <button
+        *ngIf="output"
+        class="copy-btn"
+        (click)="copyOutput()"
+        aria-label="Copy generated code to clipboard">
+        📋 Copy
+      </button>
+    </div>
+    <pre
+      class="stream-output"
+      [class.streaming-cursor]="isStreaming"
+      aria-live="polite"
+      aria-label="Generated SKY UX code output">{{ output }}</pre>
+  </div>
+
+</section>

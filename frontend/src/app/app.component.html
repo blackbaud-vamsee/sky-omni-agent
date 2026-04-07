@@ -1,0 +1,68 @@
+<!-- ===== App Shell ===== -->
+<div class="app-shell">
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav" role="banner">
+    <div class="nav-brand">
+      <span class="brand-icon" aria-hidden="true">🤿</span>
+      <div class="brand-text">
+        <span class="brand-name">SKY-Omni Agent</span>
+        <span class="brand-tagline">Intelligent Engineering Partner</span>
+      </div>
+    </div>
+    <div class="nav-badge">
+      <span class="badge-text">OTG Hackathon · D538</span>
+    </div>
+  </header>
+
+  <!-- Mode Tabs -->
+  <nav class="mode-tabs" role="tablist" aria-label="Agent mode">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'architect'"
+      role="tab"
+      [attr.aria-selected]="activeTab === 'architect'"
+      aria-controls="architect-panel"
+      (click)="setTab('architect')">
+      <span class="tab-icon" aria-hidden="true">🏗️</span>
+      <span class="tab-label">The Architect</span>
+      <span class="tab-desc">Design → Code</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'medic'"
+      role="tab"
+      [attr.aria-selected]="activeTab === 'medic'"
+      aria-controls="medic-panel"
+      (click)="setTab('medic')">
+      <span class="tab-icon" aria-hidden="true">🩺</span>
+      <span class="tab-label">The Medic</span>
+      <span class="tab-desc">Log → Logic</span>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" role="main">
+    <div
+      id="architect-panel"
+      role="tabpanel"
+      [hidden]="activeTab !== 'architect'"
+      aria-labelledby="architect-tab">
+      <app-architect></app-architect>
+    </div>
+
+    <div
+      id="medic-panel"
+      role="tabpanel"
+      [hidden]="activeTab !== 'medic'"
+      aria-labelledby="medic-tab">
+      <app-medic></app-medic>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer" role="contentinfo">
+    <span>SKY-Omni Agent · Built with Java 21 + Spring Boot 3.5 + LangChain4j + Anthropic Claude · Angular 18</span>
+  </footer>
+
+</div>
