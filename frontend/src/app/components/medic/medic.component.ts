@@ -35,7 +35,7 @@ export class MedicComponent implements OnDestroy {
 
   // Short labels for the demo chip buttons (parallel array to demoLogs)
   readonly demoLabels = [
-    'Gift NPE',
+    'DB Pool Drain',
     'SKY UX Module',
     'Token Expired',
     'Rate Limit 429',
@@ -48,12 +48,22 @@ export class MedicComponent implements OnDestroy {
 
   // Demo logs for the hackathon presentation
   readonly demoLogs = [
-    // --- 1. Gift processing NPE (existing) ---
-    `[2026-03-14 09:22:31] ERROR GiftProcessingService - Unhandled exception during gift commit
-com.blackbaud.luminate.gifts.GiftProcessingService.commitGift(GiftProcessingService.java:247)
-java.lang.NullPointerException: Cannot invoke "com.blackbaud.re.api.GiftRecord.getConstituent()" because "giftRecord" is null
-    at com.blackbaud.luminate.gifts.GiftProcessingService.commitGift(GiftProcessingService.java:247)
-Caused by: com.blackbaud.re.api.exception.ConstituentNotFoundException: No constituent found for email: donor@example.com`,
+    // --- 1. HikariCP connection pool exhaustion in scheduled RE NXT sync ---
+    `[2026-04-06 09:15:33] ERROR c.b.sync.ConstituentSyncScheduler - Scheduled RE NXT full sync FAILED after 847s
+[2026-04-06 09:15:33] ERROR o.s.orm.jpa.JpaTransactionManager - HikariPool-1 - Connection is not available, request timed out after 30000ms
+java.lang.RuntimeException: Unable to acquire JDBC Connection
+  at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:108)
+  at com.blackbaud.renxt.sync.ConstituentBatchProcessor.processChunk(ConstituentBatchProcessor.java:187)
+  at com.blackbaud.renxt.sync.ConstituentSyncScheduler.runFullSync(ConstituentSyncScheduler.java:94)
+Caused by: com.zaxxer.hikari.pool.HikariPool\$PoolTimeoutException:
+  HikariPool-1 - Connection is not available, request timed out after 30000ms.
+  Active connections : 10/10  ← pool EXHAUSTED
+  Pending threads   : 23
+  Avg tx duration   : 847s   ← CRITICAL (normal: <5s)
+  Total borrows     : 4,821 in last 300s
+[2026-04-06 09:15:33] WARN  c.z.hikari.pool.ProxyLeakTask - Connection leak detected in ConstituentSyncScheduler.runFullSync()
+[2026-04-06 09:15:33] WARN  HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=41023ms)
+[2026-04-06 09:15:33] ERROR DispatcherServlet - 23 web API requests failed with HTTP 500 while pool was exhausted`,
 
     // --- 2. SKY UX Angular module not imported ---
     `ERROR in src/app/features/gift-form/gift-form.component.html:12:5

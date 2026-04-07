@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SKY-Omni Agent — OTG Hackathon 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bb-teal: #007a8a;
+    --bb-teal-dark: #005f6b;
+    --bb-teal-light: #00afc5;
+    --bb-accent: #f4a81d;
+    --bb-white: #ffffff;
+    --bb-offwhite: #f5f7f8;
+    --bb-slate: #2d3748;
+    --bb-muted: #5a6a7a;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #1a1a2e;
+    color: var(--bb-white);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── DECK CONTAINER ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* ── SLIDE BACKGROUNDS ── */
+  .slide-title    { background: linear-gradient(135deg, #003d47 0%, #007a8a 50%, #005f6b 100%); }
+  .slide-problem  { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+  .slide-solution { background: linear-gradient(135deg, #003d47 0%, #004a55 100%); }
+  .slide-demo     { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); }
+  .slide-arch     { background: linear-gradient(135deg, #1a1a2e 0%, #003d47 100%); }
+  .slide-built    { background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%); }
+  .slide-impact   { background: linear-gradient(135deg, #004a55 0%, #003d47 100%); }
+  .slide-data     { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+  .slide-ai       { background: linear-gradient(135deg, #003d47 0%, #1a1a2e 100%); }
+  .slide-next     { background: linear-gradient(135deg, #007a8a 0%, #005f6b 50%, #003d47 100%); }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #ffe17a;
+    margin-bottom: 12px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.2; margin-bottom: 8px; color: #ffffff; text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+  h3 { font-size: 1rem; font-weight: 700; color: #ffe17a; margin-bottom: 6px; }
+  .subtitle {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: rgba(255,255,255,0.95);
+    margin-top: 16px;
+    max-width: 680px;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--bb-accent);
+    color: #1a1a2e;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 28px;
+  }
+  .cards-2 { grid-template-columns: 1fr 1fr; }
+  .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-align: left;
+  }
+  .card-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .card p { font-size: 0.85rem; color: rgba(255,255,255,0.95); line-height: 1.5; margin-top: 4px; }
+  .card.highlight {
+    background: rgba(0,175,197,0.15);
+    border-color: var(--bb-teal-light);
+  }
+
+  /* ── AGENT BLOCKS ── */
+  .agents { display: flex; gap: 24px; width: 100%; max-width: 860px; margin-top: 28px; }
+  .agent-block {
+    flex: 1;
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: left;
+  }
+  .agent-architect { background: rgba(0,122,138,0.35); border: 1.5px solid var(--bb-teal-light); }
+  .agent-medic     { background: rgba(244,168,29,0.18); border: 1.5px solid var(--bb-accent); }
+  .agent-block .name { font-size: 1.1rem; font-weight: 700; margin: 8px 0 4px; color: #ffffff; }
+  .agent-block .input-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #ffe17a; margin-top: 12px; }
+  .agent-block .value { font-size: 0.82rem; color: rgba(255,255,255,0.97); margin-top: 2px; line-height: 1.4; }
+  .agent-architect .emoji { font-size: 2.2rem; }
+  .agent-medic .emoji { font-size: 2.2rem; }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 860px;
+    margin-top: 28px;
+    overflow: hidden;
+  }
+  .arch-box {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .arch-box .ab-icon { font-size: 1.4rem; }
+  .arch-box .ab-label { font-size: 0.72rem; font-weight: 800; color: #ffe17a; margin: 4px 0 2px; letter-spacing: 0.05em; }
+  .arch-box .ab-tech { font-size: 0.65rem; color: rgba(255,255,255,0.95); line-height: 1.4; }
+  .arch-arrow { font-size: 1.2rem; color: #ffe17a; padding: 0 6px; flex-shrink: 0; }
+
+  /* ── TABLE ── */
+  table { width: 100%; max-width: 800px; border-collapse: collapse; margin-top: 24px; font-size: 0.85rem; }
+  th { background: rgba(255,255,255,0.12); color: #ffffff; font-weight: 700; padding: 10px 14px; text-align: left; border-bottom: 2px solid rgba(255,225,122,0.6); }
+  td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.97); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; text-align: left; max-width: 700px; margin-top: 24px; width: 100%; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.12);
+    font-size: 0.9rem; color: rgba(255,255,255,0.97);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .ck { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .checklist strong { color: #fff; }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    background: rgba(255,255,255,0.06);
+    border-left: 3px solid var(--bb-accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    text-align: left;
+    max-width: 820px;
+    width: 100%;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.97);
+    line-height: 1.6;
+  }
+
+  /* ── PILL BADGES ── */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+  .pill {
+    background: rgba(0,0,0,0.35);
+    border: 1.5px solid rgba(255,255,255,0.55);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .pill.accent { background: rgba(244,168,29,0.85); border-color: #f4a81d; color: #1a1a2e; text-shadow: none; font-weight: 800; }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: var(--bb-teal); }
+  .nav-counter { font-size: 0.8rem; color: rgba(255,255,255,0.9); min-width: 50px; text-align: center; font-weight: 600; }
+
+  /* ── SLIDE DOTS ── */
+  .dots { display: flex; gap: 6px; }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.45);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active { background: #ffe17a; transform: scale(1.4); }
+
+  /* ── SLIDE NUMBER ── */
+  .slide-num {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.1em;
+    z-index: 100;
+    font-weight: 600;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--bb-teal-light);
+    transition: width 0.4s ease;
+    z-index: 200;
+  }
+
+  /* ── LOGO ── */
+  .logo-mark {
+    position: fixed;
+    top: 18px; left: 24px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    z-index: 100;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { width: 40px; height: 3px; background: var(--bb-teal-light); border-radius: 2px; margin: 14px auto; }
+
+  /* ── BIG STAT ── */
+  .stat-row { display: flex; gap: 32px; margin-top: 28px; }
+  .stat { text-align: center; }
+  .stat .num { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; color: #ffe17a; }
+  .stat .label { font-size: 0.75rem; color: rgba(255,255,255,0.92); margin-top: 4px; font-weight: 500; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .slide { padding: 32px 24px; }
+    .agents { flex-direction: column; }
+    .cards-3 { grid-template-columns: 1fr 1fr; }
+    .arch-flow { flex-direction: column; }
+    .arch-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="logo-mark">SKY-Omni Agent</div>
+<div class="slide-num" id="slideNum">1 / 10</div>
+
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 1 — TITLE
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-title active" id="slide-1">
+    <div class="tag">OTG Hackathon 2026 · Team D538</div>
+    <h1>SKY-Omni Agent</h1>
+    <div class="divider"></div>
+    <p class="subtitle">An intelligent engineering partner for Blackbaud developers — powered by RAG, LangChain4j, and GitHub Models</p>
+    <div class="pills" style="margin-top: 36px;">
+      <span class="pill">🏗️ Architect Agent</span>
+      <span class="pill">🩺 Medic Agent</span>
+      <span class="pill accent">Live Streaming AI</span>
+      <span class="pill">SKY UX · RE NXT · Luminate</span>
+    </div>
+    <p style="font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.95); margin-top: 40px; letter-spacing: 0.04em;">Vamseekrushna &amp; Sekhar Dutt &nbsp;·&nbsp; April 2026</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 2 — PROBLEM
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-problem" id="slide-2">
+    <div class="eyebrow">The Problem</div>
+    <h2>Blackbaud developers waste hours on two pain points</h2>
+    <div class="divider"></div>
+    <div class="cards cards-2">
+      <div class="card highlight">
+        <div class="card-icon">📖</div>
+        <h3>SKY UX Doc Fatigue</h3>
+        <p>Engineers context-switch across 35+ component docs, NPM packages, and API references just to scaffold a single form — losing 20–30 min per feature.</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-icon">🔥</div>
+        <h3>Error Archaeology</h3>
+        <p>When Luminate, RE NXT, or SKY API throws cryptic stack traces, developers spend hours searching Slack, Confluence, and StackOverflow for root causes.</p>
+      </div>
+    </div>
+    <div class="quote-block" style="margin-top: 20px;">
+      💬 "I spent 3 hours debugging a NULL constituent error that turned out to be a missing <code>@Transactional</code> boundary — something a senior knew in 2 minutes."
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 3 — SOLUTION
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-solution" id="slide-3">
+    <div class="eyebrow">The Solution</div>
+    <h2>Two specialized AI agents. One intelligent partner.</h2>
+    <div class="divider"></div>
+    <div class="agents">
+      <div class="agent-block agent-architect">
+        <span class="emoji">🏗️</span>
+        <div class="name">The Architect</div>
+        <div class="input-label">Input</div>
+        <div class="value">Natural language UI requirement</div>
+        <div class="input-label" style="margin-top: 10px;">Output</div>
+        <div class="value">Production-ready Angular + SKY UX component code, correct imports, accessibility, standalone module</div>
+        <div class="input-label" style="margin-top: 10px;">RAG Knowledge</div>
+        <div class="value">35-component SKY UX doc index, NPM package map, design patterns</div>
+      </div>
+      <div class="agent-block agent-medic">
+        <span class="emoji">🩺</span>
+        <div class="name">The Medic</div>
+        <div class="input-label">Input</div>
+        <div class="value">Raw error log (Luminate / RE NXT / SKY API / Spring Boot)</div>
+        <div class="input-label" style="margin-top: 10px;">Output</div>
+        <div class="value">TRIAGE → ROOT CAUSE → IMMEDIATE FIX → PREVENTION — structured diagnosis, copy-paste fix</div>
+        <div class="input-label" style="margin-top: 10px;">RAG Knowledge</div>
+        <div class="value">9 Blackbaud-specific error patterns (and growing)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 4 — DEMO
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-demo" id="slide-4">
+    <div class="eyebrow">Live Demo</div>
+    <h2>See it in action</h2>
+    <div class="divider"></div>
+    <div class="cards cards-2" style="max-width: 820px;">
+      <div class="card">
+        <div class="card-icon">🏗️</div>
+        <h3>Architect Demo Flow</h3>
+        <p>Prompt: <em>"Build a gift entry form with constituent lookup, amount input, and date picker using SKY UX"</em><br><br>→ Streams complete Angular component with correct <code>SkyInputBoxModule</code>, <code>SkyLookupModule</code>, <code>SkyDatepickerModule</code> imports</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🩺</div>
+        <h3>Medic Demo Flow</h3>
+        <p>Paste: RE NXT <code>HikariPool-1 — Connection is not available, request timed out after 30000ms. Active: 10/10. Avg tx: 847s</code><br><br>→ Diagnoses <code>@Transactional</code> on the outer scheduler loop holding all 10 DB connections for 14 min — recommends chunk-based Spring Batch fix + leak detection</p>
+      </div>
+    </div>
+    <div class="pills" style="margin-top: 22px;">
+      <span class="pill">Token-by-token streaming</span>
+      <span class="pill">POST-based SSE</span>
+      <span class="pill">10 demo error scenarios</span>
+      <span class="pill accent">No page reload</span>
+    </div>
+    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 18px;">▶ Demo video: <span style="color: var(--bb-teal-light);">[link to be added before submission]</span></p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 5 — ARCHITECTURE
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-arch" id="slide-5">
+    <div class="eyebrow">Architecture</div>
+    <h2>How it works</h2>
+    <div class="divider"></div>
+    <div class="arch-flow">
+      <div class="arch-box">
+        <div class="ab-icon">🖥️</div>
+        <div class="ab-label">Angular 18</div>
+        <div class="ab-tech">Standalone components<br>fetchEventSource<br>POST-SSE streaming</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <div class="ab-icon">⚙️</div>
+        <div class="ab-label">Spring Boot 3.5</div>
+        <div class="ab-tech">Java 17 · Flux&lt;String&gt;<br>Virtual Threads<br>Port 9494</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <div class="ab-icon">🔗</div>
+        <div class="ab-label">LangChain4j</div>
+        <div class="ab-tech">AiServices proxy<br>@SystemMessage<br>ContentRetriever</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <div class="ab-icon">🧠</div>
+        <div class="ab-label">BGE Embeddings</div>
+        <div class="ab-tech">ONNX local model<br>InMemoryStore<br>No API key needed</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <div class="ab-icon">🤖</div>
+        <div class="ab-label">GitHub Models</div>
+        <div class="ab-tech">GPT-4o<br>Copilot PAT auth<br>models.inference.ai</div>
+      </div>
+    </div>
+    <div class="cards cards-2" style="max-width: 820px; margin-top: 16px;">
+      <div class="card">
+        <h3>RAG Config</h3>
+        <p>Chunk: 500 chars · Overlap: 50 · maxResults: 5 · minScore: 0.55 · Two isolated embedding stores (Architect / Medic)</p>
+      </div>
+      <div class="card">
+        <h3>Knowledge Base</h3>
+        <p>docs/skyux/ — 3 curated .md files (35 components)<br>docs/errors/ — 9 Blackbaud error pattern files</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 6 — BUILT DURING 48 HOURS
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-built" id="slide-6">
+    <div class="eyebrow">Hackathon Scope</div>
+    <h2>Built during 48 hours vs. prior work</h2>
+    <div class="divider"></div>
+    <table>
+      <thead>
+        <tr><th>✅ Built During Hackathon</th><th>📦 Prior / Existing Work</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Dual RAG pipeline (Architect + Medic agents)</td><td>Spring Boot 3 project boilerplate</td></tr>
+        <tr><td>BGE-Small-EN-v1.5 local ONNX embedding integration</td><td>Angular 18 standalone component skeleton</td></tr>
+        <tr><td>All 9 Blackbaud-specific error pattern .md files</td><td>Basic Maven project structure</td></tr>
+        <tr><td>3 curated SKY UX knowledge base .md files (live-fetched)</td><td>GitHub Models API account/PAT</td></tr>
+        <tr><td>Token streaming via POST-SSE (fetchEventSource)</td><td>—</td></tr>
+        <tr><td>LangChain4j AiServices + @SystemMessage agent interfaces</td><td>—</td></tr>
+        <tr><td>Frontend: tab shell, streaming UI, 9-scenario demo chips</td><td>—</td></tr>
+        <tr><td>CORS config, application.properties, start.sh</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 7 — IMPACT
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-impact" id="slide-7">
+    <div class="eyebrow">Impact</div>
+    <h2>Who benefits and how</h2>
+    <div class="divider"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <div class="card-icon">👨‍💻</div>
+        <h3>Blackbaud Developers</h3>
+        <p>Reduce SKY UX onboarding from days to hours. Junior devs produce senior-quality component code on first try.</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-icon">🏢</div>
+        <h3>Blackbaud (Org)</h3>
+        <p>Lower engineering support burden. Standardize SKY UX adoption. Capture institutional error knowledge before it walks out the door.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <h3>Customers</h3>
+        <p>Faster feature delivery. Fewer production bugs from misused SKY components. Consistent, accessible UI across products.</p>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">35+</div>
+        <div class="label">SKY UX components in KB</div>
+      </div>
+      <div class="stat">
+        <div class="num">10</div>
+        <div class="label">Error patterns indexed</div>
+      </div>
+      <div class="stat">
+        <div class="num">&lt;2s</div>
+        <div class="label">First token to screen</div>
+      </div>
+      <div class="stat">
+        <div class="num">$0</div>
+        <div class="label">Infra cost (local embeddings)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 8 — DATA SOURCES & LICENSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-data" id="slide-8">
+    <div class="eyebrow">Data Sources &amp; Licenses</div>
+    <h2>What knowledge powers SKY-Omni</h2>
+    <div class="divider"></div>
+    <table>
+      <thead>
+        <tr><th>Source</th><th>Type</th><th>License / Access</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>developer.blackbaud.com/skyux</td><td>SKY UX component docs (fetched during hackathon)</td><td>Public Blackbaud documentation</td></tr>
+        <tr><td>BGE-Small-EN-v1.5 (BAAI)</td><td>Local ONNX embedding model</td><td>Apache 2.0 — via LangChain4j</td></tr>
+        <tr><td>GitHub Models API (GPT-4o)</td><td>LLM inference endpoint</td><td>GitHub Copilot PAT — free tier, hackathon use</td></tr>
+        <tr><td>LangChain4j 0.36.2</td><td>AI orchestration framework</td><td>Apache 2.0</td></tr>
+        <tr><td>Spring Boot 3.5 / Angular 18</td><td>Application frameworks</td><td>Apache 2.0 / MIT</td></tr>
+        <tr><td>@microsoft/fetch-event-source</td><td>POST-SSE client library</td><td>MIT</td></tr>
+        <tr><td>Blackbaud internal error patterns</td><td>Manually authored .md knowledge base files</td><td>Original content — created during hackathon</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 9 — AI USAGE DISCLOSURE
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-ai" id="slide-9">
+    <div class="eyebrow">AI Usage Disclosure</div>
+    <h2>How GitHub Copilot was used</h2>
+    <div class="divider"></div>
+    <ul class="checklist">
+      <li>
+        <span class="ck">🤖</span>
+        <span><strong>Scaffolding</strong> — Copilot generated initial Spring Boot controller, CORS config, and Angular component skeletons from brief prompts like <em>"Spring Boot controller for SSE streaming with Flux"</em></span>
+      </li>
+      <li>
+        <span class="ck">🤖</span>
+        <span><strong>LangChain4j Integration</strong> — Prompted: <em>"LangChain4j AiServices builder with ContentRetriever and Flux streaming return type"</em></span>
+      </li>
+      <li>
+        <span class="ck">🤖</span>
+        <span><strong>Knowledge Base Authoring</strong> — Copilot assisted writing Blackbaud-specific error pattern .md files from real error descriptions</span>
+      </li>
+      <li>
+        <span class="ck">🤖</span>
+        <span><strong>Frontend Streaming UI</strong> — Prompted: <em>"Angular component consuming SSE stream token by token and appending to a code-highlighted div"</em></span>
+      </li>
+      <li>
+        <span class="ck">✍️</span>
+        <span><strong>Human authored</strong> — All @SystemMessage prompts (agent personalities), RAG configuration parameters, SKY UX knowledge curation, and hackathon-specific business logic</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SLIDE 10 — NEXT STEPS & OWNER
+  ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-next" id="slide-10">
+    <div class="eyebrow">Next Steps &amp; Owner</div>
+    <h2>Where SKY-Omni goes from here</h2>
+    <div class="divider"></div>
+    <div class="cards cards-2" style="max-width: 840px;">
+      <div class="card">
+        <div class="card-icon">🗺️</div>
+        <h3>Immediate (Sprint 1)</h3>
+        <p>• Connect to live Blackbaud error telemetry (Datadog/Splunk)<br>• Add RE NXT / Luminate product-specific knowledge bases<br>• Persist vector store to disk (avoid cold-start reload)</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <h3>Medium-term (Q3 2026)</h3>
+        <p>• VS Code extension wrapper (inline code generation)<br>• Feedback loop — developers rate diagnoses to grow KB<br>• Slack bot integration (/ask-architect, /diagnose)</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏢</div>
+        <h3>Enterprise-scale</h3>
+        <p>• Replace InMemory store with PostgreSQL pgvector<br>• Multi-tenant: per-product isolated knowledge silos<br>• Fine-tune on Blackbaud codebase (anonymized)</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <h3>Project Owner</h3>
+        <p><strong style="color:#fff;">Vamseekrushna &amp; Sekhar Dutt</strong><br>OTG Hackathon · Team D538<br>GitHub: blackbaud-vamsee/sky-omni-agent<br>April 2026</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── NAVIGATION ── -->
+<nav class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">‹</button>
+  <div class="dots" id="dots"></div>
+  <span class="nav-counter" id="counter">1 / 10</span>
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">›</button>
+</nav>
+
+<script>
+  const TOTAL = 10;
+  let current = 1;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    dotsEl.children[current - 1].classList.remove('active');
+    current = Math.max(1, Math.min(TOTAL, n));
+    document.getElementById('slide-' + current).classList.add('active');
+    dotsEl.children[current - 1].classList.add('active');
+    document.getElementById('counter').textContent = current + ' / ' + TOTAL;
+    document.getElementById('slideNum').textContent = current + ' / ' + TOTAL;
+    document.getElementById('progress').style.width = (current / TOTAL * 100) + '%';
+  }
+
+  function navigate(dir) { goTo(current + dir); }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  navigate(-1);
+  });
+
+  // Init progress
+  document.getElementById('progress').style.width = (1 / TOTAL * 100) + '%';
+</script>
+</body>
+</html>
